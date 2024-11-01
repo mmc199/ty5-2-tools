@@ -398,6 +398,27 @@ namespace ty5_2_tools
                         Console.WriteLine($"创建符号链接时出错: {ex.Message}");
                     }
 
+                    // 检查扩展名是否为 .jpg
+                    if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // 构建对应的 .jgw 文件路径
+                        string jgwFilePath = Path.ChangeExtension(targetFile, ".jgw");
+                        string targetJgwPath = Path.Combine(targetSubDirectory, Path.GetFileName(jgwFilePath));
+
+                        // 检查 .jgw 文件是否存在，如果存在则复制
+                        if (File.Exists(jgwFilePath))
+                        {
+                            try
+                            {
+                                File.Copy(jgwFilePath, targetJgwPath, true); // true 表示如果目标文件已存在则覆盖
+                                Console.WriteLine($"已复制 {jgwFilePath} 到 {targetJgwPath}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"复制 .jgw 文件时出错: {ex.Message}");
+                            }
+                        }
+                    }
 
                 }
             }
