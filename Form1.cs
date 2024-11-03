@@ -197,6 +197,8 @@ namespace ty5_2_tools
             // 动态添加选项
             comboBox1.Items.Add(".jpg");
             comboBox1.Items.Add(".png");
+            comboBox1.Items.Add(".tif");
+            comboBox1.Items.Add(".bmp");
             comboBox1.Items.Add(".dwg");
 
             // 强制用户选择索引0，防止不选择任何选项
@@ -306,6 +308,7 @@ namespace ty5_2_tools
             }
         }
 
+
         private void button3_Click(object sender, EventArgs e)
         {
 
@@ -398,24 +401,31 @@ namespace ty5_2_tools
                         Console.WriteLine($"创建符号链接时出错: {ex.Message}");
                     }
 
-                    // 检查扩展名是否为 .jpg
-                    if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // 构建对应的 .jgw 文件路径
-                        string jgwFilePath = Path.ChangeExtension(targetFile, ".jgw");
-                        string targetJgwPath = Path.Combine(targetSubDirectory, Path.GetFileName(jgwFilePath));
+                    var extensionMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+{
+    { ".jpg", ".jgw" },
+    { ".png", ".pgw" },
+    { ".tif", ".tfw" }
+};
 
-                        // 检查 .jgw 文件是否存在，如果存在则复制
-                        if (File.Exists(jgwFilePath))
+                    // 检查当前扩展名是否在映射中
+                    if (extensionMap.TryGetValue(extension, out string companionExtension))
+                    {
+                        // 构建配套文件路径
+                        string companionFilePath = Path.ChangeExtension(targetFile, companionExtension);
+                        string targetCompanionPath = Path.Combine(targetSubDirectory, Path.GetFileName(companionFilePath));
+
+                        // 检查配套文件是否存在并复制
+                        if (File.Exists(companionFilePath))
                         {
                             try
                             {
-                                File.Copy(jgwFilePath, targetJgwPath, true); // true 表示如果目标文件已存在则覆盖
-                                Console.WriteLine($"已复制 {jgwFilePath} 到 {targetJgwPath}");
+                                File.Copy(companionFilePath, targetCompanionPath, true);
+                                Console.WriteLine($"已复制 {companionFilePath} 到 {targetCompanionPath}");
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine($"复制 .jgw 文件时出错: {ex.Message}");
+                                Console.WriteLine($"复制配套文件时出错: {ex.Message}");
                             }
                         }
                     }
