@@ -365,6 +365,38 @@ namespace ty5_2_tools
                     string targetFileName = Path.GetFileName(targetFile);
                     string linkPath = Path.Combine(targetSubDirectory, targetFileName);
 
+
+                    // 定义文件扩展名与配套文件扩展名的映射
+                    var extensionMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+{
+    { ".jpg", ".jgw" },
+    { ".png", ".pgw" },
+    { ".tif", ".tfw" }
+};
+
+                    // 检查当前扩展名是否在映射中
+                    if (extensionMap.TryGetValue(extension, out string companionExtension))
+                    {
+                        // 构建配套文件路径
+                        string companionFilePath = Path.ChangeExtension(targetFile, companionExtension);
+                        string targetCompanionPath = Path.Combine(targetSubDirectory, Path.GetFileName(companionFilePath));
+
+                        // 检查配套文件是否存在并复制
+                        if (File.Exists(companionFilePath))
+                        {
+                            try
+                            {
+                                File.Copy(companionFilePath, targetCompanionPath, true);
+                                Console.WriteLine($"已复制 {companionFilePath} 到 {targetCompanionPath}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"复制配套文件时出错: {ex.Message}");
+                            }
+                        }
+                    }
+
+
                     // 检查链接或文件是否已存在，并删除
                     if (File.Exists(linkPath) || Directory.Exists(linkPath))
                     {
@@ -401,34 +433,7 @@ namespace ty5_2_tools
                         Console.WriteLine($"创建符号链接时出错: {ex.Message}");
                     }
 
-                    var extensionMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-{
-    { ".jpg", ".jgw" },
-    { ".png", ".pgw" },
-    { ".tif", ".tfw" }
-};
 
-                    // 检查当前扩展名是否在映射中
-                    if (extensionMap.TryGetValue(extension, out string companionExtension))
-                    {
-                        // 构建配套文件路径
-                        string companionFilePath = Path.ChangeExtension(targetFile, companionExtension);
-                        string targetCompanionPath = Path.Combine(targetSubDirectory, Path.GetFileName(companionFilePath));
-
-                        // 检查配套文件是否存在并复制
-                        if (File.Exists(companionFilePath))
-                        {
-                            try
-                            {
-                                File.Copy(companionFilePath, targetCompanionPath, true);
-                                Console.WriteLine($"已复制 {companionFilePath} 到 {targetCompanionPath}");
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine($"复制配套文件时出错: {ex.Message}");
-                            }
-                        }
-                    }
 
                 }
             }
